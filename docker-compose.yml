@@ -1,0 +1,16 @@
+
+    
+services:
+  db:
+    image: postgres:12
+    restart: unless-stopped
+    env_file: 
+      - .env
+    volumes:
+      - .data/db:/var/lib/postgresql/data
+    ports:
+      - '$DB_PORT:5432'
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
