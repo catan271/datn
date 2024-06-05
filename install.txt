@@ -1,0 +1,8 @@
+python-dotenv
+tensorflow<2.11
+pandas
+sqlalchemy
+psycopg2
+matplotlib
+seaborn
+ipykernel
