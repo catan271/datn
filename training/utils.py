@@ -18,7 +18,7 @@ def date_range(start: datetime.date, end: datetime.date, step: datetime.timedelt
 def plot_accuracy(predicted_values, actual_values, feature_name='Values', limit :tuple[int, int] = None):
     plt.figure(figsize=(15, 14))
     # Create scatter plot
-    plt.scatter(x=actual_values, y=predicted_values, alpha=0.5, s=1, color="blue")
+    plt.scatter(x=actual_values, y=predicted_values, alpha=0.1, s=8, color="blue")
     # heatmap
     # sns.kdeplot(x=actual_values, y=predicted_values, cmap="viridis", fill=False, thresh=0, levels=100)
 
