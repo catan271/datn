@@ -16,11 +16,12 @@ def date_range(start: datetime.date, end: datetime.date, step: datetime.timedelt
         start += step        
 
 def plot_accuracy(predicted_values, actual_values, feature_name='Values', limit :tuple[int, int] = None):
-    plt.figure(figsize=(15, 14))
+    plt.figure(figsize=(10, 10))
     # Create scatter plot
     plt.scatter(x=actual_values, y=predicted_values, alpha=0.1, s=8, color="blue")
     # heatmap
-    # sns.kdeplot(x=actual_values, y=predicted_values, cmap="viridis", fill=False, thresh=0, levels=100)
+    # plt.hexbin(actual_values, predicted_values, gridsize=100, cmap='viridis', mincnt=1, vmin=0, vmax=50)
+
 
     # Add line of equality for reference
     min_val = min(min(actual_values), min(predicted_values))
