@@ -1,8 +1,27 @@
 import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
-import seaborn as sns
+import os
+import numpy as np
+import json
 
+def minmax_scale(array: np.ndarray, name: str):
+    with open('../datasets/parameters.json', 'r') as file:
+        parameters = json.load(file)
+    min_val, max_val = parameters[f'{name}_min'], parameters[f'{name}_max']
+    return (array - min_val) / (max_val - min_val)
+
+def minmax_descale(array: np.ndarray, name: str):
+    with open('../datasets/parameters.json', 'r') as file:
+        parameters = json.load(file)
+    min_val, max_val = parameters[f'{name}_min'], parameters[f'{name}_max']
+    return array * (max_val - min_val) + min_val
+
+
+def date_range(start: datetime.date, end: datetime.date, step: datetime.timedelta):
+    while start < end:
+        yield start
+        start += step  
 
 def df_to_X_y(df: pd.DataFrame):
     df_as_np = df.to_numpy()
@@ -10,10 +29,37 @@ def df_to_X_y(df: pd.DataFrame):
     y = df_as_np[:, :4]
     return X, y
 
-def date_range(start: datetime.date, end: datetime.date, step: datetime.timedelta):
-    while start < end:
-        yield start
-        start += step        
+def preprocess_c(df: pd.DataFrame):
+    prev_days = int(os.getenv('PREV_DAYS'))
+    array = df.to_numpy()
+    y = array[:, 0:4]
+    y[:, 0] = minmax_scale(y[:, 0], 'view')
+    y[:, 1] = minmax_scale(y[:, 1], 'cart')
+    y[:, 2] = minmax_scale(y[:, 2], 'remove_from_cart')
+    y[:, 3] = minmax_scale(y[:, 3], 'purchase')
+
+    X1 = array[:, 4:8]
+    X1 = X1.reshape(X1.shape[0], 1, 4)
+    X1[:, :, 0] = minmax_scale(X1[:, :, 0], 'rank')
+    X1[:, :, 1] = minmax_scale(X1[:, :, 1], 'rank_in_category')
+    X1[:, :, 2] = minmax_scale(X1[:, :, 2], 'days_on_shelf')
+    X1[:, :, 3] = minmax_scale(X1[:, :, 3], 'price')
+    
+
+    X2 = array[:, 8:prev_days * 4 + 8]
+    X2 = X2.reshape(X2.shape[0], prev_days, 4)
+    X2[:, :, 0] = minmax_scale(X2[:, :, 0], 'view')
+    X2[:, :, 1] = minmax_scale(X2[:, :, 1], 'cart')
+    X2[:, :, 2] = minmax_scale(X2[:, :, 2], 'remove_from_cart')
+    X2[:, :, 3] = minmax_scale(X2[:, :, 3], 'purchase')
+    return X1, X2, y  
+
+def postprocess_c(y):
+    y[:, 0] = minmax_descale(y[:, 0], 'view')
+    y[:, 1] = minmax_descale(y[:, 1], 'cart')
+    y[:, 2] = minmax_descale(y[:, 2], 'remove_from_cart')
+    y[:, 3] = minmax_descale(y[:, 3], 'purchase')
+    return y
 
 def plot_accuracy(predicted_values, actual_values, feature_name='Values', limit :tuple[int, int] = None):
     plt.figure(figsize=(10, 10))
