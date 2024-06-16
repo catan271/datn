@@ -8,20 +8,20 @@ import json
 def data_scale(array: np.ndarray, name: str):
     with open('../datasets/parameters.json', 'r') as file:
         parameters = json.load(file)
-    val_mean = parameters[f'{name}_mean']
-    val_std = parameters[f'{name}_std']
-    # val_min = parameters[f'{name}_min']
-    # val_max = parameters[f'{name}_max']
-    return (array - val_mean) / val_std
+    # val_mean = parameters[f'{name}_mean']
+    # val_std = parameters[f'{name}_std']
+    val_min = parameters[f'{name}_min']
+    val_max = parameters[f'{name}_max']
+    return (array - val_min) / (val_max - val_min)
 
 def data_descale(array: np.ndarray, name: str):
     with open('../datasets/parameters.json', 'r') as file:
         parameters = json.load(file)
-    val_mean = parameters[f'{name}_mean']
-    val_std = parameters[f'{name}_std']
-    # val_min = parameters[f'{name}_min']
-    # val_max = parameters[f'{name}_max']
-    return array * val_std + val_mean
+    # val_mean = parameters[f'{name}_mean']
+    # val_std = parameters[f'{name}_std']
+    val_min = parameters[f'{name}_min']
+    val_max = parameters[f'{name}_max']
+    return array * (val_max - val_min) + val_min
 
 
 def date_range(start: datetime.date, end: datetime.date, step: datetime.timedelta):
