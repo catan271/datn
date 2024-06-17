@@ -35,6 +35,30 @@ def df_to_X_y(df: pd.DataFrame):
     y = df_as_np[:, :4]
     return X, y
 
+def preprocess_b(df: pd.DataFrame):
+    prev_days = int(os.getenv('PREV_DAYS'))
+    array = df.to_numpy()
+    
+    y = array[:, 0:4]
+    y[:, 0] = data_scale(y[:, 0], 'view')
+    y[:, 1] = data_scale(y[:, 1], 'cart')
+    y[:, 2] = data_scale(y[:, 2], 'remove_from_cart')
+    y[:, 3] = data_scale(y[:, 3], 'purchase')
+
+    X = array[:, 4:prev_days * 4 + 8]
+    X[:, 0] = data_scale(X[:, 0], 'rank')
+    X[:, 1] = data_scale(X[:, 1], 'rank_in_category')
+    X[:, 2] = data_scale(X[:, 2], 'days_on_shelf')
+    X[:, 3] = data_scale(X[:, 3], 'price')
+    
+    X[:, 4::4] = data_scale(X[:, 4::4], 'view')
+    X[:, 5::4] = data_scale(X[:, 5::4], 'cart')
+    X[:, 6::4] = data_scale(X[:, 6::4], 'remove_from_cart')
+    X[:, 7::4] = data_scale(X[:, 7::4], 'purchase')
+
+    return X, y
+    
+
 def preprocess_c(df: pd.DataFrame):
     prev_days = int(os.getenv('PREV_DAYS'))
     array = df.to_numpy()
