@@ -46,8 +46,8 @@ def preprocess_b(df: pd.DataFrame):
     y[:, 3] = data_scale(y[:, 3], 'purchase')
 
     X = array[:, 4:prev_days * 4 + 8]
-    X[:, 0] = data_scale(X[:, 0], 'rank')
-    X[:, 1] = data_scale(X[:, 1], 'rank_in_category')
+    X[:, 0] = (1 - data_scale(X[:, 0], 'rank'))
+    X[:, 1] = (1 - data_scale(X[:, 1], 'rank_in_category'))
     X[:, 2] = data_scale(X[:, 2], 'days_on_shelf')
     X[:, 3] = data_scale(X[:, 3], 'price')
     
@@ -70,8 +70,8 @@ def preprocess_c(df: pd.DataFrame):
 
     X1 = array[:, 4:8]
     X1 = X1.reshape(X1.shape[0], 1, 4)
-    X1[:, :, 0] = data_scale(X1[:, :, 0], 'rank')
-    X1[:, :, 1] = data_scale(X1[:, :, 1], 'rank_in_category')
+    X1[:, :, 0] = (1 - data_scale(X1[:, :, 0], 'rank'))
+    X1[:, :, 1] = (1 - data_scale(X1[:, :, 1], 'rank_in_category'))
     X1[:, :, 2] = data_scale(X1[:, :, 2], 'days_on_shelf')
     X1[:, :, 3] = data_scale(X1[:, :, 3], 'price')
     
