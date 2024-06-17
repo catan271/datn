@@ -62,34 +62,24 @@ def preprocess_b(df: pd.DataFrame):
 def preprocess_c(df: pd.DataFrame):
     prev_days = int(os.getenv('PREV_DAYS'))
     array = df.to_numpy()
-    y = array[:, 0:4]
+    y = array[:, 0:3]
     y[:, 0] = data_scale(y[:, 0], 'view')
     y[:, 1] = data_scale(y[:, 1], 'cart')
-    y[:, 2] = data_scale(y[:, 2], 'remove_from_cart')
-    y[:, 3] = data_scale(y[:, 3], 'purchase')
+    y[:, 2] = data_scale(y[:, 2], 'purchase')
 
-    X1 = array[:, 4:8]
-    X1 = X1.reshape(X1.shape[0], 1, 4)
-    X1[:, :, 0] = (1 - data_scale(X1[:, :, 0], 'rank'))
-    X1[:, :, 1] = (1 - data_scale(X1[:, :, 1], 'rank_in_category'))
-    X1[:, :, 2] = data_scale(X1[:, :, 2], 'days_on_shelf')
-    X1[:, :, 3] = data_scale(X1[:, :, 3], 'price')
+    X1 = array[:, 3:6]
+    X1 = X1.reshape(X1.shape[0], 1, 3)
+    X1[:, :, 0] = (1 - data_scale(X1[:, :, 0], 'rank_in_category'))
+    X1[:, :, 1] = data_scale(X1[:, :, 1], 'days_on_shelf')
+    X1[:, :, 2] = data_scale(X1[:, :, 2], 'price')
     
 
-    X2 = array[:, 8:prev_days * 4 + 8]
-    X2 = X2.reshape(X2.shape[0], prev_days, 4)
+    X2 = array[:, 6:prev_days * 3 + 6]
+    X2 = X2.reshape(X2.shape[0], prev_days, 3)
     X2[:, :, 0] = data_scale(X2[:, :, 0], 'view')
     X2[:, :, 1] = data_scale(X2[:, :, 1], 'cart')
-    X2[:, :, 2] = data_scale(X2[:, :, 2], 'remove_from_cart')
-    X2[:, :, 3] = data_scale(X2[:, :, 3], 'purchase')
+    X2[:, :, 2] = data_scale(X2[:, :, 2], 'purchase')
     return X1, X2, y  
-
-def postprocess_c(y):
-    y[:, 0] = data_descale(y[:, 0], 'view')
-    y[:, 1] = data_descale(y[:, 1], 'cart')
-    y[:, 2] = data_descale(y[:, 2], 'remove_from_cart')
-    y[:, 3] = data_descale(y[:, 3], 'purchase')
-    return y
 
 def plot_accuracy(predicted_values, actual_values, feature_name='Values', limit :tuple[int, int] = None):
     plt.figure(figsize=(10, 10))
