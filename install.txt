@@ -6,3 +6,4 @@ psycopg2
 matplotlib
 seaborn
 ipykernel
+scikit-learn

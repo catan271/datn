@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import json
+from scipy import stats
 
 def data_scale(array: np.ndarray, name: str):
     with open('../datasets/parameters.json', 'r') as file:
@@ -39,22 +40,19 @@ def preprocess_b(df: pd.DataFrame):
     prev_days = int(os.getenv('PREV_DAYS'))
     array = df.to_numpy()
     
-    y = array[:, 0:4]
+    y = array[:, 0:3]
     y[:, 0] = data_scale(y[:, 0], 'view')
     y[:, 1] = data_scale(y[:, 1], 'cart')
-    y[:, 2] = data_scale(y[:, 2], 'remove_from_cart')
-    y[:, 3] = data_scale(y[:, 3], 'purchase')
+    y[:, 2] = data_scale(y[:, 2], 'purchase')
 
-    X = array[:, 4:prev_days * 4 + 8]
-    X[:, 0] = (1 - data_scale(X[:, 0], 'rank'))
-    X[:, 1] = (1 - data_scale(X[:, 1], 'rank_in_category'))
-    X[:, 2] = data_scale(X[:, 2], 'days_on_shelf')
-    X[:, 3] = data_scale(X[:, 3], 'price')
+    X = array[:, 3:prev_days * 3 + 6]
+    X[:, 0] = (1 - data_scale(X[:, 0], 'rank_in_category'))
+    X[:, 1] = (1 - data_scale(X[:, 1], 'days_on_shelf'))
+    X[:, 2] = data_scale(X[:, 2], 'price')
     
-    X[:, 4::4] = data_scale(X[:, 4::4], 'view')
-    X[:, 5::4] = data_scale(X[:, 5::4], 'cart')
-    X[:, 6::4] = data_scale(X[:, 6::4], 'remove_from_cart')
-    X[:, 7::4] = data_scale(X[:, 7::4], 'purchase')
+    X[:, 3::3] = data_scale(X[:, 3::3], 'view')
+    X[:, 4::3] = data_scale(X[:, 4::3], 'cart')    
+    X[:, 5::3] = data_scale(X[:, 5::3], 'purchase')
 
     return X, y
     
@@ -93,6 +91,10 @@ def plot_accuracy(predicted_values, actual_values, feature_name='Values', limit 
     min_val = min(min(actual_values), min(predicted_values))
     max_val = max(max(actual_values), max(predicted_values))
     plt.plot([min_val, max_val], [min_val, max_val], color='red', linestyle='--', label='Line of Equality')
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(actual_values, predicted_values)
+    p_display = 'p < 22e-16' if p_value < 22e-16 else f'p = {p_value:.2e}'
+    plt.text(min_val + (max_val - min_val) * 0.05, max_val - (max_val - min_val) * 0.1, f'R = {r_value:.2f}, {p_display}')
 
     # Add labels and title
     plt.xlabel('Actual Values')
